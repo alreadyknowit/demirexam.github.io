@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +8,16 @@
   <!-- Add Bootstrap CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 </head>
+
 <body>
 <div class="container mt-5">
   <button class="btn btn-primary" onclick="startExam()">Başla</button>
+
+  <div class="mt-3">
+    <label for="questionNumberInput">Gitmek istediğin soru numarasını gir:</label>
+    <input type="number" id="questionNumberInput" class="form-control" placeholder="Soru Numarası">
+    <button class="btn btn-secondary mt-2" onclick="goToQuestion()">Soruya Git</button>
+  </div>
 </div>
 
 <script>
@@ -33,11 +41,21 @@
     document.body.appendChild(link);
   }
 
-  // Function to set up the initial page
-
   // Function to start the exam
   function startExam() {
     window.location.href = 'question.html?question=1';
+  }
+
+  // Function to navigate to the specified question
+  function goToQuestion() {
+    const questionNumberInput = document.getElementById('questionNumberInput');
+    const questionNumber = parseInt(questionNumberInput.value);
+
+    if (!isNaN(questionNumber) && questionNumber > 0) {
+      window.location.href = `question.html?question=${questionNumber}`;
+    } else {
+      alert('Lütfen sayı gir.');
+    }
   }
 
   setupInitialPage();
@@ -48,4 +66,5 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 </body>
+
 </html>
