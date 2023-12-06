@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Question</title>
+  <!-- Add Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+<div id="questionContainer" class="container mt-5"></div>
+<style>
+  .mb-2, .my-2 {
+    margin-bottom: 0.5rem !important;
+    display: block;
+  }
+</style>
+<script>
+  // Function to fetch JSON data
+  async function fetchData() {
+    try {
+      const response = await fetch('data.json');
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      return null;
+    }
+  }
+
+  // Function to create HTML element
+  function createElement(tag, content, onClick) {
+    const element = document.createElement(tag);
+    element.textContent = content;
+    element.addEventListener('click', onClick);
+    return element;
+  }
+
+  // Declare answerButton and resultMessage outside the createExamStructure function
+  let answerButton;
+  let resultMessage = createElement('p', '');
+
+  // Function to handle "Show Answer" button click
+  function showAnswer(question) {
+    const correctAnswer = createElement('p', 'Doğru Cevap: ' + question['Doğru Cevap']);
+    document.getElementById('questionContainer').insertBefore(correctAnswer, answerButton);
+    document.getElementById('questionContainer').insertBefore(resultMessage, answerButton);
+    answerButton.style.display = 'none'; // Hide the "Show Answer" button after revealing the answer
+  }
+
+  // Function to handle selecting an answer
+  // Function to handle selecting an answer
+  // Function to handle selecting an answer
+  function selectAnswer(optionKey, question) {
+    const correctAnswer = question['Doğru Cevap'];
+    const selectedLetter = optionKey.charAt(optionKey.length - 1); // Extract the last character
+
+    // Update the existing resultMessage element
+    resultMessage.textContent = selectedLetter.toUpperCase() === correctAnswer.toUpperCase()
+      ? 'Tebrikler! Doğru Cevap'
+      : 'Bilemedin gizem kardeşşşşş! Doğru cevap: ' + correctAnswer + "'dı";
+
+    // Set text color to green for correct answer, red for wrong answer
+    resultMessage.style.color = selectedLetter.toUpperCase() === correctAnswer.toUpperCase() ? 'green' : 'red';
+
+    // Insert the updated result message before the "Show Answer" button
+    document.getElementById('questionContainer').insertBefore(resultMessage, answerButton);
+  }
+
+
+
+  // Function to handle "Next Question" button click
+  function nextQuestion(questionNumber, examData) {
+    if (questionNumber < examData.length) {
+      window.location.href = `question.html?question=${questionNumber + 1}`;
+    } else {
+      const endMessage = createElement('p', 'End of the exam');
+      document.getElementById('questionContainer').appendChild(endMessage);
+    }
+  }
+
+  // Extract question number from the URL
+  const params = new URLSearchParams(window.location.search);
+  const questionNumber = parseInt(params.get('question'));
+
+  // Load questions and create exam structure
+  fetchData().then(examData => createExamStructure(questionNumber, examData));
+
+  // Function to create exam structure from JSON data
+  async function createExamStructure(questionNumber, examData) {
+    const container = document.getElementById('questionContainer');
+
+    if (!examData || questionNumber < 1 || questionNumber > examData.length) {
+      const errorMessage = createElement('p', 'Question not found');
+      container.appendChild(errorMessage);
+      return;
+    }
+
+    const question = examData[questionNumber - 1];
+
+    container.innerHTML = ''; // Clear previous content
+
+    container.appendChild(createElement('h2', `${questionNumber} - ${question[' Kategori Adı']}`));
+    container.appendChild(createElement('p', question['Soru Metni']));
+
+    const options = ['Cevap A', 'Cevap B', 'Cevap C', 'Cevap D'];
+    options.forEach((optionKey, index) => {
+      const answerOption = createElement('button', optionKey + ': ' + question[optionKey], () => selectAnswer(optionKey, question));
+      answerOption.className = 'btn btn-outline-primary my-2';
+      container.appendChild(answerOption);
+    });
+
+    answerButton = createElement('button', 'Cevabı Göster');
+    answerButton.addEventListener('click', () => showAnswer(question));
+    answerButton.className = 'btn btn-primary my-2';
+    container.appendChild(answerButton);
+
+    const nextQuestionButton = createElement('button', 'Sıradaki Soru');
+    nextQuestionButton.addEventListener('click', () => nextQuestion(questionNumber, examData));
+    nextQuestionButton.className = 'btn btn-success my-2';
+    container.appendChild(nextQuestionButton);
+
+    container.appendChild(createElement('hr', ''));
+  }
+</script>
+
+<!-- Add Bootstrap JS and Popper.js -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+</html>
